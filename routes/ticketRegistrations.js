@@ -298,19 +298,20 @@ router.put('/ticket-registrations/:id/approve', async (req, res) => {
     // Send approval email with banner attachment
     const emailService = require('../services/emailService');
     const emailResult = await emailService.sendApprovalEmail(
+      registration.email,
+      registration.name,
       {
-        name: registration.name,
-        email: registration.email,
         ticketId: registration.ticketId,
-        ticketPrice: registration.ticketPrice,
-        createdAt: registration.createdAt
-      },
-      {
-        date: eventDetails?.date,
-        time: eventDetails?.time,
-        venue: eventDetails?.venue
-      },
-      bannerBuffer
+        fullName: registration.name,
+        email: registration.email,
+        phone: registration.contactNo,
+        ticketType: 'General Admission',
+        ticketPrice: 'Rs. 3,000.00',
+        eventDate: eventDetails?.date || 'TBA',
+        eventTime: eventDetails?.time || 'TBA',
+        eventVenue: eventDetails?.venue || 'TBA',
+        ticketImage: bannerBuffer
+      }
     );
 
     if (!emailResult.success) {

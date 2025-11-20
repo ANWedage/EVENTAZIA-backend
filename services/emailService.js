@@ -293,7 +293,6 @@ async function sendApprovalEmail(email, name, ticketData) {
               <p style="color: #92400e; font-size: 14px; margin: 0 0 10px 0; font-weight: 600;">⚠️ Important:</p>
               <ul style="color: #92400e; font-size: 14px; margin: 0; padding-left: 20px;">
                 <li>Please bring a printout or digital copy of your ticket</li>
-                <li>Carry a valid ID for verification</li>
                 <li>Arrive 30 minutes before the event starts</li>
                 <li>Your ticket is attached to this email</li>
               </ul>

@@ -19,6 +19,15 @@ function createTransporter() {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD,
     },
+    tls: {
+      rejectUnauthorized: false,
+      ciphers: 'SSLv3'
+    },
+    connectionTimeout: 30000, // 30 seconds
+    greetingTimeout: 30000,
+    socketTimeout: 30000,
+    debug: true, // Enable debug logs
+    logger: true
   });
 }
 

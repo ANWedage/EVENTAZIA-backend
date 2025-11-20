@@ -283,9 +283,21 @@ router.put('/ticket-registrations/:id/approve', async (req, res) => {
     registration.reviewedAt = new Date();
     await registration.save();
 
-    // Get event details for email
+    // Get event details and banner for email
     const EventDetails = require('../models/EventDetails');
     const eventDetails = await EventDetails.findOne();
+
+    // Prepare banner attachment if it exists
+    let bannerAttachment = null;
+    if (eventDetails?.bannerImage?.data) {
+      bannerAttachment = {
+        content: eventDetails.bannerImage.data,
+        filename: 'event-banner.jpg',
+        type: eventDetails.bannerImage.mimetype || 'image/jpeg',
+        disposition: 'inline',
+        content_id: 'eventBanner'
+      };
+    }
 
     // Send approval email
     const emailService = require('../services/emailService');
@@ -302,7 +314,7 @@ router.put('/ticket-registrations/:id/approve', async (req, res) => {
         eventDate: eventDetails?.date || 'TBA',
         eventTime: eventDetails?.time || 'TBA',
         eventVenue: eventDetails?.venue || 'TBA',
-        ticketImage: null
+        ticketImage: bannerAttachment
       }
     );
 

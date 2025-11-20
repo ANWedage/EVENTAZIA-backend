@@ -264,6 +264,13 @@ async function sendApprovalEmail(email, name, ticketData) {
       <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f0fdf4;">
         <div style="max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden;">
           
+          <!-- Event Banner Image -->
+          ${ticketData.ticketImage ? `
+          <div style="width: 100%; overflow: hidden;">
+            <img src="cid:eventBanner" alt="Event Banner" style="width: 100%; height: auto; display: block;" />
+          </div>
+          ` : ''}
+          
           <!-- Header -->
           <div style="background: linear-gradient(135deg, #16a34a, #059669); padding: 40px 20px; text-align: center;">
             <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: bold;">🎉 Congratulations!</h1>
@@ -330,22 +337,23 @@ async function sendApprovalEmail(email, name, ticketData) {
       </html>
     `;
 
-    // Prepare attachments if ticket image is provided
+    // Prepare attachments if banner image is provided
     const attachments = [];
-    if (ticketData.ticketImage && ticketData.ticketImage.data) {
+    if (ticketData.ticketImage) {
       // Convert Buffer to base64 if needed
       let base64Data;
-      if (Buffer.isBuffer(ticketData.ticketImage.data)) {
-        base64Data = ticketData.ticketImage.data.toString('base64');
+      if (Buffer.isBuffer(ticketData.ticketImage.content)) {
+        base64Data = ticketData.ticketImage.content.toString('base64');
       } else {
-        base64Data = ticketData.ticketImage.data;
+        base64Data = ticketData.ticketImage.content;
       }
 
       attachments.push({
         content: base64Data,
-        filename: `Eventazia_Ticket_${ticketData.ticketId}.png`,
-        type: 'image/png',
-        disposition: 'attachment'
+        filename: ticketData.ticketImage.filename || 'event-banner.jpg',
+        type: ticketData.ticketImage.type || 'image/jpeg',
+        disposition: ticketData.ticketImage.disposition || 'inline',
+        content_id: ticketData.ticketImage.content_id || 'eventBanner'
       });
     }
 

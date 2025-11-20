@@ -20,6 +20,24 @@ const eventDetailsSchema = new mongoose.Schema({
     required: true,
     default: 'Grand Ballroom'
   },
+  bannerImage: {
+    data: {
+      type: Buffer,
+      default: null
+    },
+    mimetype: {
+      type: String,
+      default: null
+    },
+    size: {
+      type: Number,
+      default: null
+    },
+    uploadedAt: {
+      type: Date,
+      default: null
+    }
+  },
   updatedAt: {
     type: Date,
     default: Date.now

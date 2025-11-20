@@ -279,13 +279,13 @@ async function sendApprovalEmail(email, name, ticketData) {
             </p>
             
             <!-- Ticket Info Box -->
-            <div style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 2px solid #16a34a; border-radius: 12px; padding: 25px; margin: 0 0 30px 0;">
-              <p style="color: #065f46; font-size: 14px; margin: 0 0 15px 0; font-weight: 600;">📋 Your Ticket Details:</p>
-              <p style="color: #374151; margin: 0 0 8px 0;"><strong>Ticket ID:</strong> <span style="color: #16a34a; font-weight: bold;">${ticketData.ticketId}</span></p>
-              <p style="color: #374151; margin: 0 0 8px 0;"><strong>Name:</strong> ${ticketData.fullName}</p>
-              <p style="color: #374151; margin: 0 0 8px 0;"><strong>Email:</strong> ${ticketData.email}</p>
-              <p style="color: #374151; margin: 0 0 8px 0;"><strong>Phone:</strong> ${ticketData.phone}</p>
-              <p style="color: #374151; margin: 0;"><strong>Ticket Type:</strong> ${ticketData.ticketType}</p>
+            <div style="background: #1e3a2e; border: 2px solid #16a34a; border-radius: 12px; padding: 25px; margin: 0 0 30px 0;">
+              <p style="color: #86efac; font-size: 14px; margin: 0 0 15px 0; font-weight: 600;">📋 Your Ticket Details:</p>
+              <p style="color: #ffffff; margin: 0 0 8px 0;"><strong>Ticket ID:</strong> <span style="color: #4ade80; font-weight: bold;">${ticketData.ticketId}</span></p>
+              <p style="color: #ffffff; margin: 0 0 8px 0;"><strong>Name:</strong> ${ticketData.fullName}</p>
+              <p style="color: #ffffff; margin: 0 0 8px 0;"><strong>Email:</strong> ${ticketData.email}</p>
+              <p style="color: #ffffff; margin: 0 0 8px 0;"><strong>Phone:</strong> ${ticketData.phone}</p>
+              <p style="color: #ffffff; margin: 0;"><strong>Ticket Type:</strong> ${ticketData.ticketType}</p>
             </div>
             
             <!-- Important Info -->

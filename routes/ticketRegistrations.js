@@ -241,7 +241,7 @@ router.get('/ticket-registrations/:id/download-slip', async (req, res) => {
 
 /**
  * PUT /api/ticket-registrations/:id/approve
- * Approve a registration, generate ticket ID, and send approval email with banner
+ * Approve a registration, generate ticket ID, and send approval email
  */
 router.put('/ticket-registrations/:id/approve', async (req, res) => {
   try {
@@ -283,19 +283,11 @@ router.put('/ticket-registrations/:id/approve', async (req, res) => {
     registration.reviewedAt = new Date();
     await registration.save();
 
-    // Get event details and banner for email
+    // Get event details for email
     const EventDetails = require('../models/EventDetails');
     const eventDetails = await EventDetails.findOne();
-    
-    let bannerBuffer = null;
-    if (eventDetails && eventDetails.bannerImage && eventDetails.bannerImage.data) {
-      bannerBuffer = {
-        data: eventDetails.bannerImage.data,
-        mimetype: eventDetails.bannerImage.mimetype
-      };
-    }
 
-    // Send approval email with banner attachment
+    // Send approval email
     const emailService = require('../services/emailService');
     const emailResult = await emailService.sendApprovalEmail(
       registration.email,
@@ -310,7 +302,7 @@ router.put('/ticket-registrations/:id/approve', async (req, res) => {
         eventDate: eventDetails?.date || 'TBA',
         eventTime: eventDetails?.time || 'TBA',
         eventVenue: eventDetails?.venue || 'TBA',
-        ticketImage: bannerBuffer
+        ticketImage: null
       }
     );
 

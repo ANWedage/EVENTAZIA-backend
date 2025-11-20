@@ -167,7 +167,9 @@ router.get('/event-details/banner', async (req, res) => {
     }
 
     res.setHeader('Content-Type', details.bannerImage.mimetype);
-    res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 1 day
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     res.send(details.bannerImage.data);
 
   } catch (error) {

@@ -178,20 +178,25 @@ router.get('/ticket-registrations/notifications', async (req, res) => {
 
     // Find all registrations with additional descriptions
     const notifications = await TicketRegistration.find({
-      additionalDescription: { $ne: null, $ne: '' }
+      additionalDescription: { $exists: true, $ne: null, $ne: '' }
     })
     .select('name email additionalDescription descriptionReadBy createdAt status')
     .sort({ createdAt: -1 });
 
+    // Additional filter to ensure only valid descriptions are shown
+    const validNotifications = notifications.filter(
+      notif => notif.additionalDescription && notif.additionalDescription.trim() !== ''
+    );
+
     // Filter unread notifications for this admin
-    const unreadNotifications = notifications.filter(
+    const unreadNotifications = validNotifications.filter(
       notif => !notif.descriptionReadBy.includes(username || 'Admin')
     );
 
     res.json({
       success: true,
       data: {
-        all: notifications,
+        all: validNotifications,
         unread: unreadNotifications,
         unreadCount: unreadNotifications.length
       }

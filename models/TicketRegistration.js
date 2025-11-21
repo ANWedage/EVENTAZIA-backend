@@ -21,6 +21,15 @@ const ticketRegistrationSchema = new mongoose.Schema({
     trim: true,
     lowercase: true
   },
+  additionalDescription: {
+    type: String,
+    default: null,
+    trim: true
+  },
+  descriptionReadBy: {
+    type: [String],
+    default: []
+  },
   ticketPrice: {
     type: Number,
     required: true,

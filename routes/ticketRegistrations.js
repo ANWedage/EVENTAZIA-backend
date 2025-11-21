@@ -168,6 +168,121 @@ router.get('/ticket-registrations/stats', async (req, res) => {
 });
 
 /**
+ * GET /api/ticket-registrations/notifications
+ * Get all registrations with additional descriptions (notifications)
+ * IMPORTANT: Must be before /:id route to avoid route collision
+ */
+router.get('/ticket-registrations/notifications', async (req, res) => {
+  try {
+    const { username } = req.query;
+
+    // Find all registrations with additional descriptions
+    const notifications = await TicketRegistration.find({
+      additionalDescription: { $ne: null, $ne: '' }
+    })
+    .select('name email additionalDescription descriptionReadBy createdAt status')
+    .sort({ createdAt: -1 });
+
+    // Filter unread notifications for this admin
+    const unreadNotifications = notifications.filter(
+      notif => !notif.descriptionReadBy.includes(username || 'Admin')
+    );
+
+    res.json({
+      success: true,
+      data: {
+        all: notifications,
+        unread: unreadNotifications,
+        unreadCount: unreadNotifications.length
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Error fetching notifications:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch notifications',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+/**
+ * PUT /api/ticket-registrations/:id/mark-read
+ * Mark a notification as read by admin
+ */
+router.put('/ticket-registrations/:id/mark-read', async (req, res) => {
+  try {
+    const { username } = req.body;
+
+    const registration = await TicketRegistration.findById(req.params.id);
+
+    if (!registration) {
+      return res.status(404).json({
+        success: false,
+        message: 'Registration not found'
+      });
+    }
+
+    // Add username to descriptionReadBy if not already there
+    if (!registration.descriptionReadBy.includes(username || 'Admin')) {
+      registration.descriptionReadBy.push(username || 'Admin');
+      await registration.save();
+    }
+
+    res.json({
+      success: true,
+      message: 'Notification marked as read'
+    });
+
+  } catch (error) {
+    console.error('❌ Error marking notification as read:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to mark notification as read',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+/**
+ * DELETE /api/ticket-registrations/:id/notification
+ * Delete additional description (notification) from registration
+ */
+router.delete('/ticket-registrations/:id/notification', async (req, res) => {
+  try {
+    const registration = await TicketRegistration.findById(req.params.id);
+
+    if (!registration) {
+      return res.status(404).json({
+        success: false,
+        message: 'Registration not found'
+      });
+    }
+
+    // Clear the additional description
+    registration.additionalDescription = null;
+    registration.descriptionReadBy = [];
+    await registration.save();
+
+    console.log(`🗑️  Notification deleted for registration: ${registration.email}`);
+
+    res.json({
+      success: true,
+      message: 'Notification deleted successfully'
+    });
+
+  } catch (error) {
+    console.error('❌ Error deleting notification:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete notification',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+/**
  * GET /api/ticket-registrations/:id
  * Get a single registration
  */
@@ -444,120 +559,6 @@ router.delete('/ticket-registrations/:id', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to delete registration',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
-  }
-});
-
-/**
- * GET /api/ticket-registrations/notifications
- * Get all registrations with additional descriptions (notifications)
- */
-router.get('/ticket-registrations/notifications', async (req, res) => {
-  try {
-    const { username } = req.query;
-
-    // Find all registrations with additional descriptions
-    const notifications = await TicketRegistration.find({
-      additionalDescription: { $ne: null, $ne: '' }
-    })
-    .select('name email additionalDescription descriptionReadBy createdAt status')
-    .sort({ createdAt: -1 });
-
-    // Filter unread notifications for this admin
-    const unreadNotifications = notifications.filter(
-      notif => !notif.descriptionReadBy.includes(username || 'Admin')
-    );
-
-    res.json({
-      success: true,
-      data: {
-        all: notifications,
-        unread: unreadNotifications,
-        unreadCount: unreadNotifications.length
-      }
-    });
-
-  } catch (error) {
-    console.error('❌ Error fetching notifications:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch notifications',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
-  }
-});
-
-/**
- * PUT /api/ticket-registrations/:id/mark-read
- * Mark a notification as read by admin
- */
-router.put('/ticket-registrations/:id/mark-read', async (req, res) => {
-  try {
-    const { username } = req.body;
-
-    const registration = await TicketRegistration.findById(req.params.id);
-
-    if (!registration) {
-      return res.status(404).json({
-        success: false,
-        message: 'Registration not found'
-      });
-    }
-
-    // Add username to descriptionReadBy if not already there
-    if (!registration.descriptionReadBy.includes(username || 'Admin')) {
-      registration.descriptionReadBy.push(username || 'Admin');
-      await registration.save();
-    }
-
-    res.json({
-      success: true,
-      message: 'Notification marked as read'
-    });
-
-  } catch (error) {
-    console.error('❌ Error marking notification as read:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to mark notification as read',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
-  }
-});
-
-/**
- * DELETE /api/ticket-registrations/:id/notification
- * Delete additional description (notification) from registration
- */
-router.delete('/ticket-registrations/:id/notification', async (req, res) => {
-  try {
-    const registration = await TicketRegistration.findById(req.params.id);
-
-    if (!registration) {
-      return res.status(404).json({
-        success: false,
-        message: 'Registration not found'
-      });
-    }
-
-    // Clear the additional description
-    registration.additionalDescription = null;
-    registration.descriptionReadBy = [];
-    await registration.save();
-
-    console.log(`🗑️  Notification deleted for registration: ${registration.email}`);
-
-    res.json({
-      success: true,
-      message: 'Notification deleted successfully'
-    });
-
-  } catch (error) {
-    console.error('❌ Error deleting notification:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to delete notification',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
